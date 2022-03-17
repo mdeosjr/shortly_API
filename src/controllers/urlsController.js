@@ -9,7 +9,7 @@ export async function postURL(req, res) {
     try {
         await connection.query(`
             INSERT INTO urls ("shortUrl", url, "userId") 
-                VALUES ($1)
+                VALUES ($1, $2, $3)
         `, [shortURL, url, user.id]);
         res.status(201).send({shortURL});
     } catch(e) {
@@ -19,17 +19,17 @@ export async function postURL(req, res) {
 };
 
 export async function getURL(req, res) {
-    const { url } = req.params;
+    const { shortUrl } = req.params;
 
     try {   
-        const shortURL = await connection.query(`
-            SELECT * FROM urls
-                WHERE urls."shortUrl"=$1
-        `, [url]);
+        const url = await connection.query(`
+            SELECT u.id, u."shortUrl", u.url FROM urls u
+                WHERE u."shortUrl"=$1
+        `, [shortUrl]);
 
-        if (shortURL.rowCount === 0) return res.sendStatus(404);
+        if (url.rowCount === 0) return res.sendStatus(404);
 
-        res.status(200).send(shortURL.rows[0])
+        res.status(200).send(url.rows[0])
     } catch(e) {
         console.error(e);
         res.sendStatus(500);
@@ -51,7 +51,7 @@ export async function deleteURL(req, res) {
             DELETE FROM urls
                 WHERE urls."userId"=$1
         `, [id])
-        res.sendStatus(204)
+        res.sendStatus(204);
     } catch(e) {
         console.error(e);
         res.sendStatus(500);

@@ -5,6 +5,6 @@ import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.
 const urlsRouter = Router();
 urlsRouter.post('/urls/shorten', validateTokenMiddleware, postURL);
 urlsRouter.get('/urls/:shortUrl', getURL);
-urlsRouter.delete('urls/:id', validateTokenMiddleware, deleteURL);
+urlsRouter.delete('/urls/:id', validateTokenMiddleware, deleteURL);
 
 export default urlsRouter;

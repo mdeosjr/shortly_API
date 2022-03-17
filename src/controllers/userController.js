@@ -35,3 +35,22 @@ export async function getUser(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getUserById(req, res) {
+  const { id } = req.params;
+  
+  try {
+    const existingUser = await connection.query(`
+      SELECT * FROM users u
+        JOIN urls ON urls."userId"=u.id
+        WHERE u.id=$1
+    `, [id]);
+
+    if (existingUser.rowCount === 0) return res.sendStatus(404);
+
+    res.status(200).send(existingUser.rows)
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(500);
+  }
+}
